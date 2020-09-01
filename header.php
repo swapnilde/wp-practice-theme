@@ -10,7 +10,14 @@
 <body>
 <nav class="navbar navbar-dark bg-dark navbar-expand-lg">
 	<a class="navbar-brand" href="#">
-		<img src="<?php echo get_template_directory_uri() ?>/assets/images/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+		<?php
+			if(function_exists( 'the_custom_logo')){
+				$custom_logo_id = get_theme_mod( 'custom_logo');
+				$logo = wp_get_attachment_image_src( $custom_logo_id);
+
+			}
+		?>
+		<img src="<?php echo $logo[0] ?>" width="30" height="30" class="d-inline-block align-top" alt="">
 		ACME
 	</a>
 	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
