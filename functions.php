@@ -29,6 +29,15 @@
 			'before_title' => '<h3 class="widget-title">',
 			'after_title' => '</h3>',
 		) );
+		register_sidebar( array(
+			'name' => __( 'Rest Page Sidebar' ),
+			'id' => 'sidebar-2',
+			'description' => __('Main sidebar for rest of the pages'),
+			'before_widget' => '<aside id="%1$s" class="widget %2$s">',
+			'after_widget' => '</aside>',
+			'before_title' => '<h3 class="widget-title">',
+			'after_title' => '</h3>',
+		) );
 	}
 
 	function acme_register_styles(){
