@@ -54,3 +54,29 @@
 	}
 
 	add_action('wp_enqueue_scripts','acme_register_scripts');
+
+	add_filter('excerpt_length','custom_excerpt_size');
+	function custom_excerpt_size($length){
+		$length = 20;
+		return $length;
+	}
+
+	add_action('save_post','log_posts_stat');
+	function log_posts_stat($post_id){
+		if(!(wp_is_post_revision( $post_id)) || wp_is_post_autosave( $post_id)){
+			return;
+		}
+
+		$post_log = get_stylesheet_directory() . '/posts_logs.txt';
+		$message = get_the_title($post_id) . 'was just saved';
+
+		if(file_exists( $post_log)){
+			$file = fopen( $post_log, 'a');
+			fwrite( $file, $message . date('F j,Y,g:i a') . "\n");
+		}else{
+			$file = fopen( $post_log, 'w');
+			fwrite( $file, $message . date('F j,Y,g:i a') . "\n");
+		}
+
+		fclose( $file);
+	}
