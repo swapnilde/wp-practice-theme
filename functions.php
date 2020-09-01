@@ -31,7 +31,7 @@
 	}
 
 	function acme_register_styles(){
-		wp_enqueue_style( 'acme_main-styles',get_template_directory_uri().'/style.css',array('bootstrap-css'),'1.0.0','all');
+		wp_enqueue_style( 'acme_main-styles',get_template_directory_uri().'/style.css',array(),'1.0.0','all');
 		wp_enqueue_style( 'acme_bootstrap-css','https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css',array(),'4.5.2','all');
 	}
 

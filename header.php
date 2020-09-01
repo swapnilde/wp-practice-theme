@@ -18,22 +18,17 @@
 	</button>
 
 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
-		<ul class="navbar-nav mr-auto">
-			<li class="nav-item active">
-				<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="#">About</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="#">Company</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="#">Blog</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" href="#">Contact</a>
-			</li>
-		</ul>
+
+		<?php
+			wp_nav_menu(
+					array(
+						'menu'=>'primary',
+						'container'=>'',
+						'theme_location'=>'primary',
+						'items_wrap'=>'<ul id=" " class="navbar-nav mr-auto">%3$s</ul>'
+					)
+			);
+		?>
+
 	</div>
 </nav>
