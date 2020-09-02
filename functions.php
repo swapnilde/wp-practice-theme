@@ -1,5 +1,7 @@
 <?php
 
+	use function Sodium\add;
+
 	function acme_theme_support(){
 		add_theme_support( 'title-tag');
 		add_theme_support( 'custom-logo');
@@ -68,7 +70,7 @@
 		}
 
 		$post_log = get_stylesheet_directory() . '/posts_logs.txt';
-		$message = get_the_title($post_id) . 'was just saved';
+		$message = get_the_title($post_id) . ' was just saved:';
 
 		if(file_exists( $post_log)){
 			$file = fopen( $post_log, 'a');
@@ -79,4 +81,85 @@
 		}
 
 		fclose( $file);
+	}
+
+	add_filter('body_class','add_class_body');
+	function add_class_body($classes) {
+		global $is_lynx, $is_gecko, $is_IE, $is_opera, $is_NS4, $is_safari, $is_chrome, $is_iphone;
+
+		if($is_lynx){
+			$classes[] = 'lynx';
+		}elseif($is_gecko) {
+			$classes[] = 'gecko';
+		}
+		elseif($is_opera) {
+			$classes[] = 'opera';
+		}
+		elseif($is_NS4) {
+			$classes[] = 'ns4';
+		}
+		elseif($is_safari) {
+			$classes[] = 'safari';
+		}
+		elseif($is_chrome) {
+			$classes[] = 'chrome';
+		}
+		elseif($is_IE) {
+			$classes[] = 'ie';
+		}
+		else {
+			$classes[] = 'unknown';
+		}
+
+		if($is_iphone) {
+			$classes[] = 'iphone';
+		}
+		return $classes;
+	}
+
+	add_action('template_redirect','member_only');
+	function member_only(){
+		if(is_page('secret-page') && !is_user_logged_in()){
+			do_action( 'user_redirected', date( "F j, Y, g:i a"));
+			wp_redirect( home_url());
+		}
+	}
+
+	add_action('user_redirected','log_when_accessed');
+	function log_when_accessed($date){
+		$access_log = get_stylesheet_directory() . '/posts_logs.txt';
+		$message = 'Someone accessed secret page at:'.$date;
+
+		if(file_exists( $access_log)){
+			$file = fopen( $access_log, 'a');
+			fwrite( $file, $message."\n");
+		}else{
+			$file = fopen( $access_log, 'w');
+			fwrite( $file, $message . "\n");
+		}
+
+		fclose( $file);
+	}
+
+	add_filter ('the_content', 'add_ad');
+	function add_ad($content) {
+		if(!is_feed() && !is_home()) {
+			$content.= "<div class='subscribe bg-dark text-white'>";
+			$content.= "<h4>Enjoyed this article?</h4>";
+			$content.= "<p>Subscribe to our  <a href='#'>RSS feed</a> and never miss a post!</p>";
+			$content.= "</div>";
+		}
+		return $content;
+	}
+
+	add_action('wp_enqueue_scripts','register_ani_js');
+	function register_ani_js(){
+		wp_register_script( 'anijs', 'https://cdn.jsdelivr.net/gh/anijs/anijs@0.9.3/dist/anijs-min.js','','',true);
+		wp_enqueue_script( 'anijs');
+	}
+
+	add_action('wp_enqueue_scripts','register_anijs_css');
+	function register_anijs_css(){
+		wp_register_style( 'anijs-css', 'http://anijs.github.io/lib/anicollection/anicollection.css','','','all');
+		wp_enqueue_style( 'anijs-css');
 	}

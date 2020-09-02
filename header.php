@@ -7,7 +7,7 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<?php wp_head(); ?>
 </head>
-<body>
+<body <?php body_class(); ?> >
 <nav class="navbar navbar-dark bg-dark navbar-expand-lg">
 	<a class="navbar-brand" href="#">
 		<?php
@@ -17,7 +17,7 @@
 
 			}
 		?>
-		<img src="<?php echo $logo[0] ?>" width="30" height="30" class="d-inline-block align-top" alt="">
+		<img src="<?php echo $logo[0] ?>" width="30" height="30" class="d-inline-block align-top animate-logo" alt="" data-anijs="if: mouseover, do: rollOut animated, to: .animate-logo, after: $removeAnim">
 		<?php echo get_bloginfo('name'); ?>
 	</a>
 	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
