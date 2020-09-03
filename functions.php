@@ -258,3 +258,55 @@
 	function loadMenuStructure() {
 		return array("index.php", "tools.php","themes.php");
 	}
+
+
+	function acme_foobar_func( $atts ) {
+		$a = shortcode_atts( array(
+			'foo' => 'something',
+			'bar' => 'something else',
+		), $atts );
+
+		return "foo = {$a['foo']}" ." ". "bar = {$a['bar']}";
+	}
+	add_shortcode( 'acme-foobar', 'acme_foobar_func' );
+
+	function acme_donate_shortcode( $atts) {
+		global $post;
+		$a = shortcode_atts(array(
+			'account' => 'your-paypal-email-address',
+			'for' => $post->post_title,
+			'onHover' => '',
+		), $atts);
+
+		return '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business='.$a['account'].'&item_name=Donation for '.$a['for'].'" title="'.$a['onHover'].'">Make a donation!</a>';
+	}
+	add_shortcode('acme-donate', 'acme_donate_shortcode');
+
+//	remove_all_shortcodes();		//removes all shortcodes
+//	remove_shortcode('bartag');		//removes specified shortcode
+
+//	$ff = shortcode_exists( 'bartag');
+//	print_r( $ff);		//outputs 1 if true
+//	die();
+
+
+		function embed_video( $atts) {
+			$a = shortcode_atts( array(
+				'url'=>'',
+				'width'=>'320',
+				'height'=>'240'
+			), $atts);
+
+			return <<<"EOT"
+<video controls width="{$a['width']}">
+    <source src="{$a['url']}"
+            type="video/webm">
+    <source src="{$a['url']}"
+            type="video/mp4">
+	<source src="{$a['url']}"
+            type="video/ogg">
+    Sorry, your browser doesn't support embedded videos.
+</video>
+EOT;
+	}
+	add_shortcode('acme-video', 'embed_video');
