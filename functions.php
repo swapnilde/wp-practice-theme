@@ -1,7 +1,5 @@
 <?php
 
-	use function Sodium\add;
-
 	function acme_theme_support(){
 		add_theme_support( 'title-tag');
 		add_theme_support( 'custom-logo');
@@ -162,4 +160,101 @@
 	function register_anijs_css(){
 		wp_register_style( 'anijs-css', 'http://anijs.github.io/lib/anicollection/anicollection.css','','','all');
 		wp_enqueue_style( 'anijs-css');
+	}
+
+	function add_dashboard_widget() {
+		wp_add_dashboard_widget( 'dashboard_widget', 'Acme Dashboard Widget', 'widget_function' );
+	}
+	add_action( 'wp_dashboard_setup', 'add_dashboard_widget' );
+
+	function widget_function() {
+		esc_html_e( "This is Dashboard Widget!", "acme" );
+	}
+
+	add_action( 'add_meta_boxes', 'sd_meta_box_add' );
+	function sd_meta_box_add()
+	{
+		add_meta_box( 'my-meta-box-id', 'Post Extra Details', 'sd_meta_box_flds', 'post', 'normal', 'high' );
+	}
+
+	function sd_meta_box_flds()
+	{
+		global $post;
+		$values = get_post_custom( $post->ID );
+		$text = isset( $values['my_meta_box_heading'] ) ? esc_attr( $values['my_meta_box_heading'][0] ) : ”;
+		$selected = isset( $values['my_meta_box_category'] ) ? esc_attr( $values['my_meta_box_category'][0] ) : ”;
+
+
+		wp_nonce_field( 'my_meta_box_nonce', 'meta_box_nonce' );
+
+		?>
+
+		<p>
+			<label for="my_meta_box_heading">Write sub-heading</label>
+			<input type="text" name="my_meta_box_heading" id="my_meta_box_heading" value="<?php echo $text; ?>"/>
+		</p>
+
+		<p>
+			<label for="my_meta_box_category">Choose Category</label>
+			<select name="my_meta_box_category" id="my_meta_box_category">
+				<option value="Marketing" <?php selected( $selected, 'Marketing' ); ?>>Marketing</option>
+				<option value="Technology" <?php selected( $selected, 'Technology' ); ?>>Technology</option>
+				<option value="Business" <?php selected( $selected, 'Business' ); ?>>Business</option>
+			</select>
+		</p>
+		<?php
+	}
+
+	add_action( 'save_post', 'cd_meta_box_save' );
+
+	function cd_meta_box_save( $post_id )
+	{
+
+		if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
+
+
+		if( !isset( $_POST['meta_box_nonce'] ) || !wp_verify_nonce( $_POST['meta_box_nonce'], 'my_meta_box_nonce' ) ) return;
+
+
+		if( !current_user_can( 'edit_post' ) ) return;
+
+
+
+		if( isset( $_POST['my_meta_box_heading'] ) )
+			update_post_meta( $post_id, 'my_meta_box_heading', esc_attr( $_POST['my_meta_box_heading'] ) );
+
+		if( isset( $_POST['my_meta_box_category'] ) )
+			update_post_meta( $post_id, 'my_meta_box_category', esc_attr( $_POST['my_meta_box_category'] ) );
+
+
+	}
+
+	add_action('admin_init', 'admin_color_scheme');
+	function admin_color_scheme(){
+		$theme_dir = get_stylesheet_directory_uri();
+		wp_admin_css_color('acme', __( 'Acme' ), $theme_dir.'/assets/css/admin-colors.css', array('#384047', '#5BC67B', '#838cc7', '#ffffff'));
+
+	}
+
+	add_action("admin_menu", "add_acme_admin_menu");
+	function add_acme_admin_menu() {
+		add_menu_page("Acme menu admin page", "Acme menu", "edit_posts",
+			"acme-menu", "acme_page_content", null, 1);
+		add_submenu_page( 'acme-menu', 'Acme menu sub page', 'Acme sub-menu', 'edit_posts', 'acme-sub-menu','acme_sub_page_content',1);
+	}
+	function acme_page_content(){
+		echo "New Acme Admin Menu Page";
+	}
+	function acme_sub_page_content(){
+		echo "New Acme Admin Sub-menu Page";
+	}
+
+	add_filter("custom_menu_order", "allowMenuStructure");
+	function allowMenuStructure() {
+		return true;
+	}
+
+	add_filter("menu_order", "loadMenuStructure");
+	function loadMenuStructure() {
+		return array("index.php", "tools.php","themes.php");
 	}
