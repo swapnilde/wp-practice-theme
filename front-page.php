@@ -20,6 +20,7 @@
 						</h2>
 						<?php
 						the_excerpt();
+						echo do_shortcode( '[acme-donate account="swapnil@gmail.com"]');
 					}
 				}
 			?>

@@ -310,3 +310,59 @@
 EOT;
 	}
 	add_shortcode('acme-video', 'embed_video');
+
+
+	add_action('init','acme_add_role');
+	function acme_add_role(){
+		add_role( 'acme_manager', 'Acme Manager',array(
+			'read'=>true,
+			'activate_plugins'=>true,
+			'install_plugins'=>true,
+			'update_plugins'=>true,
+			'delete_plugins'=>true,
+			'upload_plugins'=>true
+		));
+	}
+
+
+	add_action('after_switch_theme','acme_add_role_themer');
+	function acme_add_role_themer(){
+		add_role( 'acme_themer', 'Acme Themer',array(
+			'read'=>true,
+			'switch_themes'=>true,
+			'install_themes'=>true,
+			'update_themes'=>true,
+			'delete_themes'=>true,
+			'upload_themes'=>true
+		));
+	}
+
+	add_action('switch_theme','acme_remove_roles');
+	function acme_remove_roles(){
+		remove_role( 'acme_manager');
+		remove_role( 'acme_themer');
+	}
+
+	function acme_add_theme_caps() {
+		$role = get_role( 'author' );
+		$role->add_cap( 'edit_others_posts' );
+	}
+	add_action( 'after_switch_theme', 'acme_add_theme_caps');
+
+	function acme_add_user_caps() {
+		$user = new WP_User( 12 );
+		$user->add_cap( 'can_edit_posts' );
+	}
+	add_action( 'after_switch_theme', 'acme_add_user_caps');
+
+	function acme_remove_role_caps() {
+		$role = get_role( 'editor' );
+		$role->remove_cap( 'read_private_posts' );
+	}
+	add_action( 'switch_theme', 'acme_remove_role_caps');
+
+	function acme_remove_user_caps() {
+		$user = new WP_User( 12 );
+		$user->remove_cap( 'can_edit_posts' );
+	}
+	add_action( 'switch_theme', 'acme_remove_user_caps');
