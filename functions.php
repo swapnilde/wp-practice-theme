@@ -375,7 +375,29 @@ EOT;
 	function acme_register_faculty_post_type() {
 		$labels = array(
 			'name'                  => 'Faculties',
-			'singular_name'         => 'Faculty'
+			'singular_name'         => 'Faculty',
+			'menu_name'             => 'Faculty',
+			'name_admin_bar'        => 'Faculty',
+			'add_new'               => 'Add New',
+			'add_new_item'          => 'Add New Faculty',
+			'new_item'              => 'New Faculty',
+			'edit_item'             => 'Edit Faculty',
+			'view_item'             => 'View Faculty',
+			'all_items'             => 'All Faculty',
+			'search_items'          => 'Search Faculty',
+			'parent_item_colon'     => 'Parent Faculty:',
+			'not_found'             => 'No faculties found.',
+			'not_found_in_trash'    => 'No faculties found in Trash.',
+			'featured_image'        => 'Faculty Profile Image',
+			'set_featured_image'    => 'Set Faculty Image',
+			'remove_featured_image' => 'Remove Faculty Image',
+			'use_featured_image'    => 'Use as Faculty Image',
+			'archives'              => 'Faculty archives',
+			'insert_into_item'      => 'Insert into faculty',
+			'uploaded_to_this_item' => 'Uploaded to this faculty',
+			'filter_items_list'     => 'Filter faculties list',
+			'items_list_navigation' => 'Faculties list navigation',
+			'items_list'            => 'Faculties list',
 		);
 	 
 		$args = array(
@@ -397,10 +419,29 @@ EOT;
 	}
 
 	function acme_register_faculty_taxonomy() {
+
+		$labels = array(
+			'name'              => 'Department',
+			'singular_name'     => 'Department',
+			'search_items'      => 'Search Department',
+			'all_items'         => 'All Departments',
+			'parent_item'       => 'Parent Department',
+			'parent_item_colon' => 'Parent Department:',
+			'edit_item'         => 'Edit Department',
+			'update_item'       => 'Update Department',
+			'add_new_item'      => 'Add New Department',
+			'new_item_name'     => 'New Department Name',
+			'menu_name'         => 'Department',
+		);
+
 		register_taxonomy( 'department', 'faculty', array(
-			'label'        => 'Department',
-			'rewrite'      => array( 'slug' => 'department' ),
-			'hierarchical' => true,
+			'label'        		=> 'Department',
+			'labels'       		=> $labels,
+			'rewrite'      		=> array( 'slug' => 'department' ),
+			'hierarchical' 		=> true,
+			'show_ui'           => true,
+        	'show_admin_column' => true,
+        	'query_var'         => true,
 			'update_count_callback' => '_update_post_term_count',
 		) );
 	}
