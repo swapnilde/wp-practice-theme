@@ -3,6 +3,7 @@
 	function acme_theme_support(){
 		add_theme_support( 'title-tag');
 		add_theme_support( 'custom-logo');
+		add_theme_support( 'post-thumbnails', array( 'post', 'page','faculty' ) );
 	}
 
 	add_action('after_setup_theme','acme_theme_support');
@@ -366,3 +367,52 @@ EOT;
 		$user->remove_cap( 'can_edit_posts' );
 	}
 	add_action( 'switch_theme', 'acme_remove_user_caps');
+
+
+	
+
+
+	function acme_register_faculty_post_type() {
+		$labels = array(
+			'name'                  => 'Faculties',
+			'singular_name'         => 'Faculty'
+		);
+	 
+		$args = array(
+			'labels'             => $labels,
+			'public'             => true,
+			'publicly_queryable' => true,
+			'show_ui'            => true,
+			'show_in_menu'       => true,
+			'query_var'          => true,
+			'rewrite'            => array( 'slug' => 'faculty' ),
+			'capability_type'    => 'post',
+			'has_archive'        => true,
+			'hierarchical'       => false,
+			'menu_position'      => null,
+			'supports'           => array( 'title', 'editor', 'thumbnail' ),
+		);
+	 
+		register_post_type( 'faculty', $args );
+	}
+
+	function acme_register_faculty_taxonomy() {
+		register_taxonomy( 'department', 'faculty', array(
+			'label'        => 'Department',
+			'rewrite'      => array( 'slug' => 'department' ),
+			'hierarchical' => true,
+			'update_count_callback' => '_update_post_term_count',
+		) );
+	}
+	add_action( 'init', 'acme_register_faculty_taxonomy');
+	 
+	add_action( 'init', 'acme_register_faculty_post_type' );
+
+
+	add_action( 'after_switch_theme', 'my_rewrite_flush' );
+	function my_rewrite_flush() {
+		acme_register_faculty_post_type();
+		acme_register_faculty_taxonomy();
+		flush_rewrite_rules();
+	}
+	
