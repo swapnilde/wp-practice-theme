@@ -14,7 +14,13 @@ get_header();
 						<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
                             <?php the_title('<h1>','</h1>'); ?>
 							<div class="post-thumbnail"><?php the_post_thumbnail(array(200,200)); ?> </div>
-							<div class="entry-content"><?php the_content(); ?></div>
+							<div class="entry-content">
+								<?php the_content(); ?>
+								<p>
+									<strong>Designation:</strong><?php echo get_post_meta( get_the_ID(),'faculty_designation',true); ?>
+									<strong>Contact:</strong><?php echo get_post_meta( get_the_ID(),'faculty_contact',true); ?>
+								</p>
+							</div>
 						</article>
 					<?php endwhile; ?>
 				</div>
