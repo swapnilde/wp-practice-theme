@@ -49,9 +49,13 @@
 	add_action('wp_enqueue_scripts','acme_register_styles');
 
 	function acme_register_scripts(){
-		wp_enqueue_script( 'acme_bootstrap-jq','https://code.jquery.com/jquery-3.5.1.slim.min.js',array(),'3.5.1',true);
+		wp_enqueue_script( 'acme_bootstrap-jq','https://code.jquery.com/jquery-3.5.1.min.js',array(),'3.5.1',true);
 		wp_enqueue_script( 'acme_bootstrap-popper','https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js',array(),'1.16.1',true);
 		wp_enqueue_script( 'acme_bootstrap-js','https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js',array(),'4.5.2',true);
+		wp_enqueue_script( 'liker_script',get_stylesheet_directory_uri().'/assets/js/liker_script.js',array('acme_bootstrap-jq'),'',true);
+		wp_localize_script( 'liker_script', 'myAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
+		wp_enqueue_script( 'main-js',get_stylesheet_directory_uri().'/assets/js/acme-form.js',array(),'','true');
+		wp_localize_script( 'main-js','wpAjax', array('wpAjaxUrl' => admin_url('admin-ajax.php')));
 	}
 
 	add_action('wp_enqueue_scripts','acme_register_scripts');
@@ -375,7 +379,7 @@ EOT;
 	function my_user_like() {
 
 		if ( !wp_verify_nonce( $_REQUEST['nonce'], "my_user_like_nonce")) {
-			exit("Woof Woof Woof");
+			exit("Security Mismatch");
 		}
 
 		$like_count = get_post_meta($_REQUEST["post_id"], "likes", true);
@@ -409,9 +413,59 @@ EOT;
 		die();
 	}
 
-	add_action('wp_enqueue_scripts','liker_script_enqueue');
-	function liker_script_enqueue(){
-		wp_enqueue_script( 'acme_jquery','https://code.jquery.com/jquery-3.5.1.min.js',array(),'',true);
-		wp_enqueue_script( 'liker_script',get_stylesheet_directory_uri().'/assets/js/liker_script.js',array('acme_jquery'),'',true);
-		wp_localize_script( 'liker_script', 'myAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
+
+	function acme_add_contact_form() {
+		ob_start();
+		?>
+		<div id="acme_form_msg">
+		</div>
+		<form id="acme_contact_form" method="" action="">
+			<?php wp_nonce_field( 'acme_form_nonce_create', 'acme_form_nonce' );?>
+			<div class="form-group">
+				<label for="acme_name">Name</label> 
+				<input id="acme_name" name="acme_name" type="text" class="form-control">
+			</div>
+			<div class="form-group">
+				<label for="acme_cont_num">Contact Number</label> 
+				<input id="acme_cont_num" name="acme_cont_num" type="text" class="form-control">
+			</div> 
+			<div class="form-group">
+				<button name="submit" type="submit" id="acme_form_btn" class="btn btn-primary">Submit</button>
+			</div>
+		</form>
+		<?php
+		return ob_get_clean();
+
+}
+	add_shortcode( 'acme-contact-form', 'acme_add_contact_form' );
+
+
+	add_action("wp_ajax_acme_form_save_data", "acme_form_data");
+	add_action("wp_ajax_nopriv_acme_form_save_data", "acme_form_data");
+
+	function acme_form_data() {
+		global $wpdb;
+		if ( !wp_verify_nonce( $_POST['nonce'], "acme_form_nonce_create")) {
+			exit("Acme Security Mis-match");
+		}
+
+		$acme_name = $_POST['acme_name'];
+		$acme_cont_num = $_POST['acme_cont_num'];
+
+		$result = $wpdb->query( $wpdb->prepare( 'INSERT INTO wp_acmeform SET acmename=%s, acmecontact=%s', $acme_name,$acme_cont_num));
+
+		if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+					if($result === 1){
+						$result = array('rType'=>'Success','rMessage'=>'Data saved');
+						echo json_encode($result);
+					}else{
+						$result = array('rType'=>'Failure','rMessage'=>'Data not saved');
+						echo json_encode($result);
+					}
+		}
+		else {
+			header("Location: ".$_SERVER["HTTP_REFERER"]);
+		}
+
+		die();
 	}
