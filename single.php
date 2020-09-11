@@ -17,6 +17,16 @@
 							<div class="entry-content"><?php the_content(); ?></div>
 						</article>
 					<?php endwhile; ?>
+					<?php
+						$likes = get_post_meta($post->ID, "likes", true);
+						$likes = ($likes == "") ? 0 : $likes;
+					?>
+					This post has <span id='like_counter'><?php echo $likes ?></span> likes<br>
+					<?php
+						$nonce = wp_create_nonce("my_user_like_nonce");
+						$link = admin_url('admin-ajax.php?action=my_user_like&post_id='.$post->ID.'&nonce='.$nonce);
+						echo '<a id="user_like" class="user_like" data-nonce="' . $nonce . '" data-post_id="' . $post->ID . '" href="' . $link . '">Like this Post</a>';
+					?>
 				</div>
 			</section>
 		</div>

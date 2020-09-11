@@ -367,5 +367,51 @@ EOT;
 		$user->remove_cap( 'can_edit_posts' );
 	}
 	add_action( 'switch_theme', 'acme_remove_user_caps');
-	
-	
+
+
+	add_action("wp_ajax_my_user_like", "my_user_like");
+	add_action("wp_ajax_nopriv_my_user_like", "please_login");
+
+	function my_user_like() {
+
+		if ( !wp_verify_nonce( $_REQUEST['nonce'], "my_user_like_nonce")) {
+			exit("Woof Woof Woof");
+		}
+
+		$like_count = get_post_meta($_REQUEST["post_id"], "likes", true);
+		$like_count = ($like_count == ’) ? 0 : $like_count;
+		$new_like_count = $like_count + 1;
+
+		$like = update_post_meta($_REQUEST["post_id"], "likes", $new_like_count);
+
+		if($like === false) {
+			$result['type'] = "error";
+			$result['like_count'] = $like_count;
+		}
+		else {
+			$result['type'] = "success";
+			$result['like_count'] = $new_like_count;
+		}
+
+		if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+			$result = json_encode($result);
+			echo $result;
+		}
+		else {
+			header("Location: ".$_SERVER["HTTP_REFERER"]);
+		}
+
+		die();
+	}
+
+	function please_login() {
+		echo "You must log in to like";
+		die();
+	}
+
+	add_action('wp_enqueue_scripts','liker_script_enqueue');
+	function liker_script_enqueue(){
+		wp_enqueue_script( 'acme_jquery','https://code.jquery.com/jquery-3.5.1.min.js',array(),'',true);
+		wp_enqueue_script( 'liker_script',get_stylesheet_directory_uri().'/assets/js/liker_script.js',array('acme_jquery'),'',true);
+		wp_localize_script( 'liker_script', 'myAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));
+	}
